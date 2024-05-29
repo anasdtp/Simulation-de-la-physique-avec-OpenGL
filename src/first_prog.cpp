@@ -97,7 +97,6 @@ int main(int argc, char* args[])
 
         // The forms to render
 
-
         setupMurDeBrique(forms_list, number_of_forms);
 
         // Get first "current time"
@@ -362,19 +361,19 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
 void setupMurDeBrique(Form* formlist[MAX_FORMS_NUMBER], unsigned short &number_of_forms, int Longeur, int largeur, Color col) {
     static const int sizeLong = 2, sizelarg = 1;
 
-    ObjetSTL *brique = new ObjetSTL(col); // Créez un nouvel objet de brique en dehors de la boucle
-    if (!brique->loadSTL("Solidworks/brique.STL")){
-        printf("Failed to load brique.STL model!\n");
-        delete brique; // Supprimez l'objet brique si le chargement échoue
-        return;
-    }
+    Brique *brique = new Brique(col); // Créez un nouvel objet de brique en dehors de la boucle
+    // if (!brique->loadSTL("Solidworks/brique.STL")){
+    //     printf("Failed to load brique.STL model!\n");
+    //     delete brique; // Supprimez l'objet brique si le chargement échoue
+    //     return;
+    // }
 
     Point size(2, 1, 1);//Brique de taille max de 2 mm , 1 mm, 1 mm
     brique->setSize(size);
     printf("Size Objet : size X = %2.1f, size Y = %2.1f, size Z = %2.1f\n", size.x, size.y, size.z);
     for (int i = 0; i < largeur; i++) {
         for (int j = 0; j < Longeur; j++) {
-            ObjetSTL* newBrique = new ObjetSTL(*brique); // Créez un nouvel objet brique à chaque itération
+            Brique* newBrique = new Brique(*brique); // Créez un nouvel objet brique à chaque itération
             Point pt(j * size.x, i * size.y, 0.0 * size.x);
             newBrique->moveAbsolue(pt); // Déplacez le nouvel objet brique
             formlist[number_of_forms] = newBrique; // Stockez le nouvel objet dans le tableau

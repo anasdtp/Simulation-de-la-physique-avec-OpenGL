@@ -10,6 +10,11 @@
 #include <cmath>
 #include <GL/gl.h>
 
+
+
+//l'echelle est en metre. Soit 1 egale 1 metre
+
+
 enum SHAPE_ID{
     CUBE,
     SPHERE,
@@ -49,11 +54,15 @@ protected:
     Color col;
     Animation anim;
     SHAPE_ID _id;
+
 public:
     Animation& getAnim() {return anim;}
     void setAnim(Animation ani) {anim = ani;}
     void setID(SHAPE_ID id) {_id = id;}
     SHAPE_ID getID() {return _id;}
+
+    std::vector<Triangle> triangleSTL;//Pour le STL
+    bool loadSTL(const std::string& path);
     // This method should update the anim object with the corresponding physical model
     // It has to be done in each inherited class, otherwise all forms will have the same movements !
     // Virtual method for dynamic function call
@@ -96,31 +105,29 @@ public:
     void render();
 };
 
-class ObjetSTL : public Form
+class Brique : public Form
 {
 private:
-    std::vector<Triangle> _triangle;
-    Color _col;
     float _posX, _posY, _posZ;
     Point _sizeObjet;//La place que prend l'objet dans les trois axes
     float _masse;
 public:
-    ObjetSTL(Color cl = Color()) {
+    Brique(Color cl = Color()) {
         setID(STL);
-        _col = cl;
+        col = cl;
         _masse = 1;
     }
     void setTriangles(const std::vector<Triangle>& tris) {
-        _triangle = tris;
+        triangleSTL = tris;
     }
     void getTriangles(std::vector<Triangle>& tr){
-        tr = _triangle;
+        tr = triangleSTL;
     }
-    void setColor(Color cl) {_col = cl;}
+    void setColor(Color cl) {col = cl;}
     void setSize(const Point size) {//La place que prend l'objet dans les trois axes
         _sizeObjet = size;
     }
-    bool loadSTL(const std::string& path);
+    
     void render();
     void update(double delta_t);
 

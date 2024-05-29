@@ -27,7 +27,7 @@ Sphere::Sphere(double r, Color cl)
 
 void Sphere::update(double delta_t)
 {
-    
+
 }
 
 void Sphere::render()
@@ -54,17 +54,17 @@ Cube::Cube(Vector v1, Vector v2, Point org, double l, double w, Color cl)
 
 void Cube::update(double delta_t)
 {
-    printf("Cube\n");
+    // printf("Cube\n");
 }
 
 void Cube::render()
 {
     Point p1 = Point();
     Point p2 = p1, p3, p4 = p1;
-    p2.translate(length*vdir1);
+    p2.translate(vdir1);
     p3 = p2;
-    p3.translate(width*vdir2);
-    p4.translate(width*vdir2);
+    p3.translate(vdir2);
+    p4.translate(vdir2);
 
     Form::render();
 
@@ -78,7 +78,7 @@ void Cube::render()
     glEnd();
 }
 
-bool ObjetSTL::loadSTL(const std::string& path) {
+bool Form::loadSTL(const std::string& path) {
     // printf("Loading STL file %s\n", path );
     std::ifstream file(path, std::ios::binary);
     if (!file) {
@@ -95,11 +95,11 @@ bool ObjetSTL::loadSTL(const std::string& path) {
     file.read(reinterpret_cast<char*>(&numTriangles), sizeof(uint32_t));
 
     // Read triangles
-    _triangle.resize(numTriangles);
+    triangleSTL.resize(numTriangles);
     uint32_t i = 0;
     printf("Starting triangles read from file\n");
     for (i = 0; i < numTriangles; ++i) {
-        file.read(reinterpret_cast<char*>(&_triangle[i]), sizeof(Triangle));
+        file.read(reinterpret_cast<char*>(&triangleSTL[i]), sizeof(Triangle));
         // Skip attribute byte count
         file.ignore(2);
     }
@@ -108,25 +108,39 @@ bool ObjetSTL::loadSTL(const std::string& path) {
     return true;
 }
 
-void ObjetSTL::render() {
+void Brique::render() {
     // Render the STL model
-    Point pos = anim.getPos();
+    Form::render();
+    
+    if(!triangleSTL.size()){//Le stl n'a pas été chargée donc on doit dessiner à la main la brique
+        //Alors on affiche une brique normal de base
+        //Enzo doit faire une brique de 500/1000 de longeur, 200/1000 de largeur et 200/1000 de profondeur
+        // printf("Triangle vide !! Doit donc dessiner la brique à la main %d\n");
+            Form::render();
 
-    // Appliquer la transformation de translation à la position de l'objet
-    glTranslatef(pos.x, pos.y, pos.z);
-
-    glColor3f(_col.r, _col.g, _col.b); // White color for the model
-    glBegin(GL_TRIANGLES);
-    for (const auto& tri : _triangle) {
-        glNormal3f(tri.normal.x, tri.normal.y, tri.normal.z);
-        for (const auto& vert : tri.vertices) {
-            glVertex3f(vert.x, vert.y, vert.z);
+            glBegin(GL_QUADS);
+            {
+                glVertex3d(0, 1, 0);
+                glVertex3d(1, 1, 0);
+                glVertex3d(1, 1, 1);
+                glVertex3d(0, 1, 1);
+            }
+            glEnd();
+    }else{
+        glBegin(GL_TRIANGLES);
+        int nbTriangles = 0;
+        for (const auto& tri : triangleSTL) {
+            glNormal3f(tri.normal.x, tri.normal.y, tri.normal.z);
+            for (const auto& vert : tri.vertices) {
+                glVertex3f(vert.x, vert.y, vert.z);
+            }
+            nbTriangles++;
         }
+        glEnd();
     }
-    glEnd();
 }
 
-void ObjetSTL::update(double delta_t) {
+void Brique::update(double delta_t) {
     // Exemple d'application de la gravité
     const double g = 9.81; // Accélération gravitationnelle en m/s^2
     Vector force_gravity(0.0, -g*_masse, 0.0); // Force de gravité dirigée vers le bas
