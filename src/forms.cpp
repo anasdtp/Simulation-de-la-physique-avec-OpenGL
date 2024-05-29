@@ -19,13 +19,15 @@ void Form::render()
 
 Sphere::Sphere(double r, Color cl)
 {
+    setID(SPHERE);
     radius = r;
     col = cl;
+
 }
 
 void Sphere::update(double delta_t)
 {
-    // Complete this part
+    
 }
 
 void Sphere::render()
@@ -39,8 +41,9 @@ void Sphere::render()
     gluDeleteQuadric(quad);
 }
 
-Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color cl)
+Cube::Cube(Vector v1, Vector v2, Point org, double l, double w, Color cl)
 {
+    setID(CUBE);
     vdir1 = 1.0 / v1.norm() * v1;
     vdir2 = 1.0 / v2.norm() * v2;
     anim.setPos(org);
@@ -49,12 +52,12 @@ Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color 
     col = cl;
 }
 
-void Cube_face::update(double delta_t)
+void Cube::update(double delta_t)
 {
-    // Complete this part
+    printf("Cube\n");
 }
 
-void Cube_face::render()
+void Cube::render()
 {
     Point p1 = Point();
     Point p2 = p1, p3, p4 = p1;
@@ -126,7 +129,7 @@ void ObjetSTL::render() {
 void ObjetSTL::update(double delta_t) {
     // Exemple d'application de la gravité
     const double g = 9.81; // Accélération gravitationnelle en m/s^2
-    Vector force_gravity(0.0, -g, 0.0); // Force de gravité dirigée vers le bas
+    Vector force_gravity(0.0, -g*_masse, 0.0); // Force de gravité dirigée vers le bas
 
     // Autres forces appliquées à l'objet
     // Vector force_autre = ...
@@ -141,5 +144,5 @@ void ObjetSTL::update(double delta_t) {
     anim.setSpeed(anim.getSpeed() + acceleration.integral(delta_t));
 
     // Mettez à jour la position en fonction de la vitesse et du temps
-    // moveRelative(anim.getSpeed().integral(delta_t));
+    moveRelative(anim.getSpeed().integral(delta_t));
 }

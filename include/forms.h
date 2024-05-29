@@ -10,6 +10,14 @@
 #include <cmath>
 #include <GL/gl.h>
 
+enum SHAPE_ID{
+    CUBE,
+    SPHERE,
+    CYLINDER,
+    CONE,
+    STL
+};
+
 class Color
 {
 public:
@@ -40,9 +48,12 @@ class Form
 protected:
     Color col;
     Animation anim;
+    SHAPE_ID _id;
 public:
     Animation& getAnim() {return anim;}
     void setAnim(Animation ani) {anim = ani;}
+    void setID(SHAPE_ID id) {_id = id;}
+    SHAPE_ID getID() {return _id;}
     // This method should update the anim object with the corresponding physical model
     // It has to be done in each inherited class, otherwise all forms will have the same movements !
     // Virtual method for dynamic function call
@@ -51,7 +62,6 @@ public:
     // Virtual method : Form is a generic type, only setting color and reference position
     virtual void render();
 };
-
 
 // A particular Form
 class Sphere : public Form
@@ -68,21 +78,23 @@ public:
     void render();
 };
 
-
 // A face of a cube
-class Cube_face : public Form
+class Cube : public Form
 {
 private:
     Vector vdir1, vdir2;
     double length, width;
+    float _masse;
+    Point size;
 public:
-    Cube_face(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
+    Cube(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
           Point org = Point(), double l = 1.0, double w = 1.0,
           Color cl = Color());
+
+
     void update(double delta_t);
     void render();
 };
-
 
 class ObjetSTL : public Form
 {
@@ -91,9 +103,12 @@ private:
     Color _col;
     float _posX, _posY, _posZ;
     Point _sizeObjet;//La place que prend l'objet dans les trois axes
+    float _masse;
 public:
     ObjetSTL(Color cl = Color()) {
+        setID(STL);
         _col = cl;
+        _masse = 1;
     }
     void setTriangles(const std::vector<Triangle>& tris) {
         _triangle = tris;

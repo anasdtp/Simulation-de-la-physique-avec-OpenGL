@@ -8,8 +8,6 @@
 #include <iostream>
 #include <cmath>
 #include <GL/gl.h>
-
-
 // Module for space geometry
 #include "geometry.h"
 // Module for generating and rendering forms
@@ -92,8 +90,8 @@ int main(int argc, char* args[])
 
         // Create here specific forms and add them to the list...
         // Don't forget to update the actual number_of_forms !
-        Cube_face *pFace = NULL;
-        pFace = new Cube_face(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
+        Cube *pFace = NULL;
+        pFace = new Cube(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
         forms_list[number_of_forms] = pFace;
         number_of_forms++;
 
@@ -309,6 +307,7 @@ void update(Form* formlist[MAX_FORMS_NUMBER], double delta_t)
     unsigned short i = 0;
     while(formlist[i] != NULL)
     {
+        // printf("Type %d\n", formlist[i]->getID());
         formlist[i]->update(delta_t);
         i++;
     }
@@ -351,6 +350,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
     unsigned short i = 0;
     while(formlist[i] != NULL)
     {
+        // printf("Type %d\n", formlist[i]->getID());
         glPushMatrix(); // Preserve the camera viewing point for further forms
         formlist[i]->render();
         glPopMatrix(); // Restore the camera viewing point for next object
@@ -368,6 +368,7 @@ void setupMurDeBrique(Form* formlist[MAX_FORMS_NUMBER], unsigned short &number_o
         delete brique; // Supprimez l'objet brique si le chargement échoue
         return;
     }
+
     Point size(2, 1, 1);//Brique de taille max de 2 mm , 1 mm, 1 mm
     brique->setSize(size);
     printf("Size Objet : size X = %2.1f, size Y = %2.1f, size Z = %2.1f\n", size.x, size.y, size.z);
@@ -382,6 +383,8 @@ void setupMurDeBrique(Form* formlist[MAX_FORMS_NUMBER], unsigned short &number_o
     }
     delete brique; // Supprimez l'objet brique une fois que vous avez terminé avec lui
 }
+
+
 
 //Objet ----------------------------------
 
