@@ -70,6 +70,24 @@ public:
     virtual void update(double delta_t) = 0;
     // Virtual method : Form is a generic type, only setting color and reference position
     virtual void render();
+
+    void moveRelative(Point position) {
+        anim.setPos(anim.getPos() + position);
+    }
+    void moveAbsolue(Point position) {
+        anim.setPos(position);
+    }
+
+    void setTriangles(const std::vector<Triangle>& tris) {
+        triangleSTL = tris;
+    }
+    void getTriangles(std::vector<Triangle>& tr){
+        tr = triangleSTL;
+    }
+    void setColor(Color cl) {col = cl;}
+    void setSize(const Point size) {//La place que prend l'objet dans les trois axes
+        _sizeObjet = size;
+    }
 };
 
 // A particular Form
@@ -117,26 +135,9 @@ public:
         col = cl;
         _masse = 1;
     }
-    void setTriangles(const std::vector<Triangle>& tris) {
-        triangleSTL = tris;
-    }
-    void getTriangles(std::vector<Triangle>& tr){
-        tr = triangleSTL;
-    }
-    void setColor(Color cl) {col = cl;}
-    void setSize(const Point size) {//La place que prend l'objet dans les trois axes
-        _sizeObjet = size;
-    }
-    
+
     void render();
     void update(double delta_t);
-
-    void moveRelative(Point position) {
-        anim.setPos(anim.getPos() + position);
-    }
-    void moveAbsolue(Point position) {
-        anim.setPos(position);
-    }
 
 };
 
