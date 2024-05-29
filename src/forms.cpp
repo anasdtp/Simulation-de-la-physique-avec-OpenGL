@@ -1,0 +1,145 @@
+#include <cmath>
+#include <SDL2/SDL_opengl.h>
+#include <GL/GLU.h>
+#include "forms.h"
+
+void Form::update(double delta_t)
+{
+    // Nothing to do here, animation update is done in child class method
+}
+
+void Form::render()
+{
+    // Point of view for rendering
+    // Common for all Forms
+    Point org = anim.getPos();
+    glTranslated(org.x, org.y, org.z);
+    glColor3f(col.r, col.g, col.b);
+}
+
+Sphere::Sphere(double r, Color cl)
+{
+    radius = r;
+    col = cl;
+}
+
+void Sphere::update(double delta_t)
+{
+    // Complete this part
+}
+
+void Sphere::render()
+{
+    GLUquadric *quad;
+
+    quad = gluNewQuadric();
+
+    // Complete this part
+
+    gluDeleteQuadric(quad);
+}
+
+Cube_face::Cube_face(Vector v1, Vector v2, Point org, double l, double w, Color cl)
+{
+    vdir1 = 1.0 / v1.norm() * v1;
+    vdir2 = 1.0 / v2.norm() * v2;
+    anim.setPos(org);
+    length = l;
+    width = w;
+    col = cl;
+}
+
+void Cube_face::update(double delta_t)
+{
+    // Complete this part
+}
+
+void Cube_face::render()
+{
+    Point p1 = Point();
+    Point p2 = p1, p3, p4 = p1;
+    p2.translate(length*vdir1);
+    p3 = p2;
+    p3.translate(width*vdir2);
+    p4.translate(width*vdir2);
+
+    Form::render();
+
+    glBegin(GL_QUADS);
+    {
+        glVertex3d(p1.x, p1.y, p1.z);
+        glVertex3d(p2.x, p2.y, p2.z);
+        glVertex3d(p3.x, p3.y, p3.z);
+        glVertex3d(p4.x, p4.y, p4.z);
+    }
+    glEnd();
+}
+
+bool ObjetSTL::loadSTL(const std::string& path) {
+    // printf("Loading STL file %s\n", path );
+    std::ifstream file(path, std::ios::binary);
+    if (!file) {
+        std::cerr << "Failed to open file: " << path << std::endl;
+        return false;
+    }
+
+    // Read the header
+    char header[80] = "";
+    file.read(header, 80);
+
+    // Read number of triangles
+    uint32_t numTriangles;
+    file.read(reinterpret_cast<char*>(&numTriangles), sizeof(uint32_t));
+
+    // Read triangles
+    _triangle.resize(numTriangles);
+    uint32_t i = 0;
+    printf("Starting triangles read from file\n");
+    for (i = 0; i < numTriangles; ++i) {
+        file.read(reinterpret_cast<char*>(&_triangle[i]), sizeof(Triangle));
+        // Skip attribute byte count
+        file.ignore(2);
+    }
+    printf("numTriangles : %d\n", i);
+
+    return true;
+}
+
+void ObjetSTL::render() {
+    // Render the STL model
+    Point pos = anim.getPos();
+
+    // Appliquer la transformation de translation à la position de l'objet
+    glTranslatef(pos.x, pos.y, pos.z);
+
+    glColor3f(_col.r, _col.g, _col.b); // White color for the model
+    glBegin(GL_TRIANGLES);
+    for (const auto& tri : _triangle) {
+        glNormal3f(tri.normal.x, tri.normal.y, tri.normal.z);
+        for (const auto& vert : tri.vertices) {
+            glVertex3f(vert.x, vert.y, vert.z);
+        }
+    }
+    glEnd();
+}
+
+void ObjetSTL::update(double delta_t) {
+    // Exemple d'application de la gravité
+    const double g = 9.81; // Accélération gravitationnelle en m/s^2
+    Vector force_gravity(0.0, -g, 0.0); // Force de gravité dirigée vers le bas
+
+    // Autres forces appliquées à l'objet
+    // Vector force_autre = ...
+
+    // Somme de toutes les forces
+    Vector sum_force = force_gravity; // Ajoutez d'autres forces si nécessaire
+
+    // Calculez l'accélération en fonction de la force totale et de la masse de l'objet
+    Vector acceleration = sum_force; // Pourrait nécessiter une division par la masse de l'objet
+
+    // Mettez à jour la vitesse en fonction de l'accélération et du temps
+    anim.setSpeed(anim.getSpeed() + acceleration.integral(delta_t));
+
+    // Mettez à jour la position en fonction de la vitesse et du temps
+    // moveRelative(anim.getSpeed().integral(delta_t));
+}
