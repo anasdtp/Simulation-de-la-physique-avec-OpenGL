@@ -2,7 +2,10 @@
 #include "config.h"
 Scene::Scene()
 {
-
+    for (i=0; i<MAX_FORMS_NUMBER; i++)
+    {
+        forms_list[i] = NULL;
+    }
 
 }
 
@@ -153,12 +156,25 @@ bool Scene::init()
         // Camera position
         Point camera_position(0, 1.0, 10.0);
 
-        for (i=0; i<MAX_FORMS_NUMBER; i++)
-        {
-            forms_list[i] = NULL;
-        }
+
     }
 
+}
+
+void Scene::run()
+{
+    close(&gWindow);
+
+}
+
+void Scene::close(SDL_Window** window)
+{
+    //Destroy window
+    SDL_DestroyWindow(*window);
+    *window = NULL;
+
+    //Quit SDL subsystems
+    SDL_Quit();
 }
 
 bool Scene::addForm(Form* form)
@@ -168,6 +184,6 @@ bool Scene::addForm(Form* form)
     {
         return false;
     }
-    formlist[formIndex]
+    formlist[formIndex] = form;
 }
 

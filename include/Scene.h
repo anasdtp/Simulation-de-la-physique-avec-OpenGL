@@ -19,14 +19,15 @@
 class Scene
 {
 private:
-    Form* formlist[];
+    Form* formlist[MAX_FORMS_NUMBER];
     int formIndex =0;
 
     bool _initGL();
     bool _initWindow(SDL_Window** window, SDL_GLContext* context);
     bool setupProps();
     char checkInput();
-    bool useSDL;
+    bool useSDL=false;
+    void close(SDL_Window** window);
 
 public:
     Scene();
@@ -35,6 +36,7 @@ public:
     bool init();
     void run();
     bool addForm(Form* form);
+    bool useSDL(){return useSDL;}
 };
 
 
