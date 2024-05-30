@@ -2,10 +2,14 @@
 #include "config.h"
 Scene::Scene()
 {
+    gWindow = NULL;
+    camera_position=Point(0, 1.0, 10.0);
     for (i=0; i<MAX_FORMS_NUMBER; i++)
     {
         forms_list[i] = NULL;
     }
+    init();
+    setupObjects();
 
 }
 
@@ -133,11 +137,7 @@ bool Scene::_initGL()
 
 bool Scene::init()
 {
-    SDL_Window* gWindow = NULL;
 
-    // OpenGL context
-    SDL_GLContext gContext;
-    printf("Hello World\n");
 
     // Start up SDL and create window
     if( !_initWindow(&gWindow, &gContext))
@@ -146,23 +146,62 @@ bool Scene::init()
     }
     else
     {
-        // Main loop flag
-        bool quit = false;
-        Uint32 current_time, previous_time, elapsed_time;
-
-        // Event handler
-        SDL_Event event;
-
-        // Camera position
-        Point camera_position(0, 1.0, 10.0);
+        quit=false;
 
 
     }
 
 }
 
+void Scene::checkCollisionAll()
+{
+    int i=0;
+    while(formlist[i]!=NULL)
+    {
+        Form form = *formlist[i];
+        switch(form.getTypeForm()){
+            case SHAPE_ID.CUBE:
+            break;
+
+            default:
+            break;
+
+
+
+        }
+
+
+
+
+
+
+
+
+        formlist[i]
+    }
+    
+
+}
+
 void Scene::run()
 {
+    while(!quit)
+    {
+        checkInput();
+    // Update the scene
+        current_time = SDL_GetTicks(); // get the elapsed time from SDL initialization (ms)
+        elapsed_time = current_time - previous_time;
+        if (elapsed_time > ANIM_DELAY)
+        {
+            previous_time = current_time;
+            update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+        }
+
+        // Render the scene
+        render(forms_list, camera_position);
+        // Update window screen
+        SDL_GL_SwapWindow(gWindow);
+    }
     close(&gWindow);
 
 }
@@ -185,5 +224,98 @@ bool Scene::addForm(Form* form)
         return false;
     }
     formlist[formIndex] = form;
+    return true;
 }
 
+char checkInput()
+{
+// Handle events on queue
+    while(SDL_PollEvent(&event) != 0)
+    {
+        int x = 0, y = 0;
+        SDL_Keycode key_pressed = event.key.keysym.sym;
+
+        switch(event.type)
+        {
+        // User requests quit
+        case SDL_QUIT:
+            quit = true;
+            break;
+        case SDL_KEYDOWN:
+            // Handle key pressed with current mouse position
+            SDL_GetMouseState( &x, &y );
+            switch(key_pressed)
+            {
+            // Quit the program when 'q' or Escape keys are pressed
+            case SDLK_q:
+            case SDLK_ESCAPE:
+                quit = true;
+                break;
+            case SDLK_LEFT:
+                camera_position.x -= 1;
+                printf("Left\n");
+            break;
+            case SDLK_RIGHT:
+                camera_position.x += 1;
+                printf("Right\n");
+            break;
+            case SDLK_UP:
+                camera_position.y += 1;
+                printf("Up\n");
+            break;
+            case SDLK_DOWN:
+                camera_position.y -= 1;
+                printf("Down\n");
+            break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+bool Scene::setupObjects() // Initialisation des objets
+{
+    // Create here specific forms and add them to the list...
+    // Don't forget to update the actual number_of_forms !
+    // Cube *pFace = NULL;
+    // pFace = new Cube(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
+    // forms_list[number_of_forms] = pFace;
+    // number_of_forms++;
+
+    Sol *sol = new Sol(GREEN); // Créez un nouvel objet de brique en dehors de la boucle
+    if (!sol->loadSTL("Solidworks/sol.STL")){
+        printf("Failed to load sol.STL model!\n");
+        delete sol; // Supprimez l'objet brique si le chargement échoue
+    }
+    Point sizeSol(50, 0, 50);//sol de taille de 50 m , 0 m, 50 m
+    sol->setSize(sizeSol);
+    printf("Size Objet : size X = %2.1f, size Y = %2.1f, size Z = %2.1f\n", sizeSol.x, sizeSol.y, sizeSol.z);
+    Point pt(-sizeSol.x/2, 0, -sizeSol.z/2);
+    sol->moveAbsolue(pt); // Déplacez le nouvel objet brique
+    addForm(sol);
+
+
+}
+
+
+bool removeForm(int index)
+{
+
+
+}
+
+bool removeForm(Form* form);
+
+bool Scene::popForm()
+{
+    delete(formlist[formIndex]);
+    formlist[formIndex] = NULL;
+    if(formIndex>0)
+    {
+        formIndex--;
+    }
+}

@@ -396,7 +396,7 @@ void render(Form* formlist[MAX_FORMS_NUMBER], const Point &cam_pos)
 void setupMurDeBrique(Form* formlist[MAX_FORMS_NUMBER], unsigned short &number_of_forms, int Longeur, int largeur, Color col) {
     static const Point size(500./1000, 200./1000, 200./1000);//Brique de taille de 500 mm , 200 mm, 200 mm, exprimé en metre
 
-    Brique *brique = new Brique(col); // Créez un nouvel objet de brique en dehors de la boucle
+    Brique *brique = new Brique(col,18.4,"Solidworks/brique.STL"); // Créez un nouvel objet de brique en dehors de la boucle
     if (!brique->loadSTL("Solidworks/brique.STL")){
         printf("Failed to load brique.STL model!\n");
         delete brique; // Supprimez l'objet brique si le chargement échoue

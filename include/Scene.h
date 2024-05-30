@@ -19,15 +19,28 @@
 class Scene
 {
 private:
+
+
     Form* formlist[MAX_FORMS_NUMBER];
     int formIndex =0;
+    Uint32 current_time, previous_time, elapsed_time;
+    SDL_Event event;
+    Point camera_position;
+    SDL_Window* gWindow ;
+    SDL_GLContext gContext;
 
+
+
+    bool _quit=true;
     bool _initGL();
     bool _initWindow(SDL_Window** window, SDL_GLContext* context);
-    bool setupProps();
+    bool setupObjects();
     char checkInput();
     bool useSDL=false;
     void close(SDL_Window** window);
+    void checkColisionAll();
+    void checkColisionAll(Form* form);
+    
 
 public:
     Scene();
@@ -35,7 +48,10 @@ public:
 
     bool init();
     void run();
+    bool popForm();
     bool addForm(Form* form);
+    bool removeForm(int index);
+    bool removeForm(Form* form);
     bool useSDL(){return useSDL;}
 };
 

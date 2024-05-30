@@ -53,20 +53,19 @@ class ModelSTL
     protected:
         Point globalPosition;
         Vector globalRotation;
-    public :
-        ModelSTL();
         Color col;
+    public :
+
+        ModelSTL();
+        
         bool loadSTL(const std::string& path);
         std::vector<Triangle> triangleSTL;//Pour le STL
         void render();
+
         bool isLoaded(){return triangleSTL.size()!=0;}
         void setPosition(Point newPosition){globalPosition = newPosition;}
         Point getPosition(){return globalPosition;}
-
-
-
-
-
+        void setColor(Color newColor){col = newColor;}
 };
 
 
