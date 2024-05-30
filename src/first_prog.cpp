@@ -409,7 +409,7 @@ void setupMurDeBrique(Form* formlist[MAX_FORMS_NUMBER], unsigned short &number_o
     brique->moveAbsolue(pt); // Déplacez le nouvel objet brique
     formlist[number_of_forms] = brique; // Stockez le nouvel objet dans le tableau
     number_of_forms++;
-    
+
     // for (int i = 0; i < largeur; i++) {
     //     for (int j = 0; j < Longeur; j++) {
     //         Brique* newBrique = new Brique(*brique); // Créez un nouvel objet brique à chaque itération

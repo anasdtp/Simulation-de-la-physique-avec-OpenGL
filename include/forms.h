@@ -48,6 +48,28 @@ struct Triangle {
     Vertex vertices[3];
 };
 
+class ModelSTL
+{
+    protected:
+        Point globalPosition;
+        Vector globalRotation;
+    public :
+        ModelSTL();
+        Color col;
+        bool loadSTL(const std::string& path);
+        std::vector<Triangle> triangleSTL;//Pour le STL
+        void render();
+        bool isLoaded(){return triangleSTL.size()!=0;}
+        void setPosition(Point newPosition){globalPosition = newPosition;}
+        Point getPosition(){return globalPosition;}
+
+
+
+
+
+};
+
+
 // Generic class to render and animate an object
 class Form
 {
@@ -61,7 +83,7 @@ protected:
     Vector _Fn;
     //Partie Physique Fin -----------------------------------------------
 public:
-
+    ModelSTL modelSTL;
     Animation& getAnim() {return anim;}
     void setAnim(Animation ani) {anim = ani;}
     void setID(SHAPE_ID id) {_id = id;}
@@ -90,18 +112,18 @@ public:
     void getTriangles(std::vector<Triangle>& tr){
         tr = triangleSTL;
     }
-    void setColor(Color cl) {col = cl;} 
+    void setColor(Color cl) {col = cl;}
 
     //Partie Physique : ------------------------------------------------
     const float g = 9.81; // Accélération gravitationnelle en m/s^2
 
     void setMasse(float kg) {_masse = kg;}
     //En kg
-    float getMasse(){return _masse;} 
+    float getMasse(){return _masse;}
 
     Vector getFg(){
         //Doit dependre de la position de l'objet, sa rotation etc
-        Vector Fg(0.0, -1*getMasse()*g, 0.0); // Force de gravité dirigée vers le bas 
+        Vector Fg(0.0, -1*getMasse()*g, 0.0); // Force de gravité dirigée vers le bas
         return Fg;
     }
 
@@ -142,7 +164,7 @@ private:
 public:
     Cube(Vector v1 = Vector(1,0,0), Vector v2 = Vector(0,0,1),
           Point org = Point(), double l = 1.0, double w = 1.0,
-          Color cl = Color());
+          Color cl = Color(),char* url="");
 
 
     void update(double delta_t);
@@ -162,11 +184,17 @@ class Brique : public Form
 private:
     Point _sizeObjet;//La place que prend l'objet dans les trois axes
 public:
-    Brique(Color cl = Color(), float masse = 18.4) {
+    Brique(Color cl = Color(), float masse = 18.4,char* url = NULL) {
         setID(BRIQUE);
         col = cl;
         setMasse(masse);//En kg
         setFn(Vector(0.0, 0.0, 0.0));
+        if(url!=NULL)
+        {
+            modelSTL = ModelSTL();
+            modelSTL.loadSTL(url);
+            modelSTL.setPosition(anim.getPos());
+        }
     }
      void setSize(const Point size) {//La place que prend l'objet dans les trois axes
         _sizeObjet = size;
