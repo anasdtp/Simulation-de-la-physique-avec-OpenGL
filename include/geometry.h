@@ -44,6 +44,8 @@ public:
     operator Point() const {
         return Point(x, y, z);
     }
+
+    
 };
 
 

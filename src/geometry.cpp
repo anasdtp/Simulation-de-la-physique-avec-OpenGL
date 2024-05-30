@@ -8,7 +8,6 @@ void Point::translate(const Vector &v)
     z += v.z;
 }
 
-
 Vector::Vector(Point p1, Point p2)
 {
     x = p2.x - p1.x;

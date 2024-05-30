@@ -141,22 +141,65 @@ void Brique::render() {
 }
 
 void Brique::update(double delta_t) {
-    // Exemple d'application de la gravité
-    const double g = 9.81; // Accélération gravitationnelle en m/s^2
-    Vector force_gravity(0.0, -g*_masse, 0.0); // Force de gravité dirigée vers le bas
+    // Calcul du PFD 
 
-    // Autres forces appliquées à l'objet
-    // Vector force_autre = ...
-
-    // Somme de toutes les forces
-    Vector sum_force = force_gravity; // Ajoutez d'autres forces si nécessaire
-
-    // Calculez l'accélération en fonction de la force totale et de la masse de l'objet
-    Vector acceleration = sum_force; // Pourrait nécessiter une division par la masse de l'objet
-
-    // Mettez à jour la vitesse en fonction de l'accélération et du temps
-    anim.setSpeed(anim.getSpeed() + acceleration.integral(delta_t));
-
+    Vector sumForce = getFg() + getFn();
+    //Determination de l'acceleration à partir du PFD
+    //Somme des force = masse * acc
+    //acc = Somme des force / masse
+    Vector acc(sumForce.x/getMasse(), sumForce.y/getMasse(), sumForce.z/getMasse());
+    anim.setAccel(acc);
+    //Intergrer pour avoir la vitesse
+    Vector speed = anim.getSpeed() + anim.getAccel().integral(delta_t);//+v0;
+    anim.setSpeed(speed);
+    
+    
+    
     // Mettez à jour la position en fonction de la vitesse et du temps
-    moveRelative(anim.getSpeed().integral(delta_t));
+    // On intergre la vitesse pour obtenir le delta position qu'on vient rajouter à notre position actuelle
+    // moveRelative(anim.getSpeed().integral(delta_t));
+    Point position = speed.integral(delta_t);
+    moveRelative(position);
+
+    printf("accel : x:%1.2f y:%1.2f z:%1.2f  ;;  speed : x:%1.2f y:%1.2f z:%1.2f ;; position : x:%1.2f y:%1.2f z:%1.2f \n",
+                                        anim.getAccel().x, anim.getAccel().y, anim.getAccel().z, 
+                                        anim.getSpeed().x, anim.getSpeed().y, anim.getSpeed().z,
+                                        anim.getPos().x, anim.getPos().y, anim.getPos().z
+                                        );
+}
+
+void Sol::render() {
+    // Render the STL model
+    Form::render();
+    
+    if(!triangleSTL.size()){//Le stl n'a pas été chargée donc on doit dessiner à la main la brique
+        //Alors on affiche une brique normal de base
+        //Enzo doit faire une brique de 500/1000 de longeur, 200/1000 de largeur et 200/1000 de profondeur
+        // printf("Triangle vide !! Doit donc dessiner la brique à la main %d\n");
+            Form::render();
+
+            glBegin(GL_QUADS);
+            {
+                glVertex3d(0, 1, 0);
+                glVertex3d(1, 1, 0);
+                glVertex3d(1, 1, 1);
+                glVertex3d(0, 1, 1);
+            }
+            glEnd();
+    }else{
+        glBegin(GL_TRIANGLES);
+        int nbTriangles = 0;
+        for (const auto& tri : triangleSTL) {
+            glNormal3f(tri.normal.x, tri.normal.y, tri.normal.z);
+            for (const auto& vert : tri.vertices) {
+                glVertex3f(vert.x, vert.y, vert.z);
+            }
+            nbTriangles++;
+        }
+        glEnd();
+    }
+}
+
+void Sol::update(double delta_t) {
+    
 }

@@ -20,7 +20,8 @@ enum SHAPE_ID{
     SPHERE,
     CYLINDER,
     CONE,
-    STL
+    BRIQUE,
+    SOL
 };
 
 class Color
@@ -55,11 +56,16 @@ protected:
     Animation anim;
     SHAPE_ID _id;
 
+    //Partie Physique : ------------------------------------------------
+    float _masse;
+    Vector _Fn;
+    //Partie Physique Fin -----------------------------------------------
 public:
+
     Animation& getAnim() {return anim;}
     void setAnim(Animation ani) {anim = ani;}
     void setID(SHAPE_ID id) {_id = id;}
-    SHAPE_ID getID() {return _id;}
+    SHAPE_ID getTypeForm() {return _id;}
 
     std::vector<Triangle> triangleSTL;//Pour le STL
     bool loadSTL(const std::string& path);
@@ -84,10 +90,30 @@ public:
     void getTriangles(std::vector<Triangle>& tr){
         tr = triangleSTL;
     }
-    void setColor(Color cl) {col = cl;}
-    void setSize(const Point size) {//La place que prend l'objet dans les trois axes
-        _sizeObjet = size;
+    void setColor(Color cl) {col = cl;} 
+
+    //Partie Physique : ------------------------------------------------
+    const float g = 9.81; // Accélération gravitationnelle en m/s^2
+
+    void setMasse(float kg) {_masse = kg;}
+    //En kg
+    float getMasse(){return _masse;} 
+
+    Vector getFg(){
+        //Doit dependre de la position de l'objet, sa rotation etc
+        Vector Fg(0.0, -1*getMasse()*g, 0.0); // Force de gravité dirigée vers le bas 
+        return Fg;
     }
+
+    //force perpendiculaire à la surface du sol qui empêche l'objet de passer à travers le sol.
+    void setFn(const Vector &Fn){
+        _Fn = Fn;
+    }
+    //force perpendiculaire à la surface du sol qui empêche l'objet de passer à travers le sol.
+    Vector getFn(){
+        return _Fn;
+    }
+   //Partie Physique Fin -----------------------------------------------
 };
 
 // A particular Form
@@ -123,22 +149,46 @@ public:
     void render();
 };
 
+
+
+// Quel est le poids d'un parpaing de 20 par 20 par 50 ?
+// Parpaing creux 20x20x50 NF DB
+// longueur :	500 mm
+// largeur :	200 mm
+// hauteur :	200 mm
+// poids :	18.4 Kilo(s) (merci google)
 class Brique : public Form
 {
 private:
-    float _posX, _posY, _posZ;
     Point _sizeObjet;//La place que prend l'objet dans les trois axes
-    float _masse;
 public:
-    Brique(Color cl = Color()) {
-        setID(STL);
+    Brique(Color cl = Color(), float masse = 18.4) {
+        setID(BRIQUE);
         col = cl;
-        _masse = 1;
+        setMasse(masse);//En kg
+        setFn(Vector(0.0, 0.0, 0.0));
     }
-
+     void setSize(const Point size) {//La place que prend l'objet dans les trois axes
+        _sizeObjet = size;
+    }
     void render();
     void update(double delta_t);
-
 };
 
+class Sol : public Form
+{
+private:
+    Point _sizeObjet;//La place que prend l'objet dans les trois axes
+public:
+    Sol(Color cl = Color()) {
+        setID(SOL);
+        col = cl;
+        setMasse(1);
+    }
+     void setSize(const Point size) {//La place que prend l'objet dans les trois axes
+        _sizeObjet = size;
+    }
+    void render();
+    void update(double delta_t);
+};
 #endif // FORMS_H_INCLUDED
