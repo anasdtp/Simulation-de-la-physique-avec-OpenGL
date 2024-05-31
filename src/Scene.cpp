@@ -255,12 +255,14 @@ void Scene::close(SDL_Window** window)
 bool Scene::addForm(Form* form)
 {
 
-    formlist[formIndex] = form;
-    formIndex++;
+
+
     if(formIndex >= MAX_FORMS_NUMBER);
     {
         return false;
     }
+    formlist[formIndex] = form;
+    formIndex++;
     return true;
 }
 
