@@ -116,7 +116,7 @@ bool Form::loadSTL(const std::string& path) {
 }
 ModelSTL::ModelSTL()
 {
-    
+
 }
 
 bool ModelSTL::loadSTL(const std::string& path) {
@@ -169,7 +169,7 @@ void ModelSTL::render() {
 void Brique::render() {
     // Render the STL model
     Form::render();
-
+    printf("model_charge ? :",modelSTL.isLoaded());
     if(!modelSTL.isLoaded()){//Le stl n'a pas été chargée donc on doit dessiner à la main la brique
         //Alors on affiche une brique normal de base
         //Enzo doit faire une brique de 500/1000 de longeur, 200/1000 de largeur et 200/1000 de profondeur
@@ -191,33 +191,33 @@ void Brique::render() {
 }
 
 void Brique::update(double delta_t) {
-    // Calcul du PFD
+    // // Calcul du PFD
 
-    Vector sumForce = getFg() + getFn();
-    //Determination de l'acceleration à partir du PFD
-    //Somme des force = masse * acc
-    //acc = Somme des force / masse
-    Vector acc(sumForce.x/getMasse(), sumForce.y/getMasse(), sumForce.z/getMasse());
-    anim.setAccel(acc);
-    //Intergrer pour avoir la vitesse
-    Vector speed = anim.getSpeed() + anim.getAccel().integral(delta_t);//+v0;
-    anim.setSpeed(speed);
+    // Vector sumForce = getFg() + getFn();
+    // //Determination de l'acceleration à partir du PFD
+    // //Somme des force = masse * acc
+    // //acc = Somme des force / masse
+    // Vector acc(sumForce.x/getMasse(), sumForce.y/getMasse(), sumForce.z/getMasse());
+    // anim.setAccel(acc);
+    // //Intergrer pour avoir la vitesse
+    // Vector speed = anim.getSpeed() + anim.getAccel().integral(delta_t);//+v0;
+    // anim.setSpeed(speed);
 
 
 
-    // Mettez à jour la position en fonction de la vitesse et du temps
-    // On intergre la vitesse pour obtenir le delta position qu'on vient rajouter à notre position actuelle
-    // moveRelative(anim.getSpeed().integral(delta_t));
-    Point position = speed.integral(delta_t);
-    moveRelative(position);
+    // // Mettez à jour la position en fonction de la vitesse et du temps
+    // // On intergre la vitesse pour obtenir le delta position qu'on vient rajouter à notre position actuelle
+    // // moveRelative(anim.getSpeed().integral(delta_t));
+    // Point position = speed.integral(delta_t);
+    // moveRelative(position);
 
-    // printf("accel : x:%1.2f y:%1.2f z:%1.2f  ;;  speed : x:%1.2f y:%1.2f z:%1.2f ;; position : x:%1.2f y:%1.2f z:%1.2f \n",
-    //                                     anim.getAccel().x, anim.getAccel().y, anim.getAccel().z,
-    //                                     anim.getSpeed().x, anim.getSpeed().y, anim.getSpeed().z,
-    //                                     anim.getPos().x, anim.getPos().y, anim.getPos().z
-    //                                     );
-    modelSTL.setPosition(anim.getPos());
-    
+    // // printf("accel : x:%1.2f y:%1.2f z:%1.2f  ;;  speed : x:%1.2f y:%1.2f z:%1.2f ;; position : x:%1.2f y:%1.2f z:%1.2f \n",
+    // //                                     anim.getAccel().x, anim.getAccel().y, anim.getAccel().z,
+    // //                                     anim.getSpeed().x, anim.getSpeed().y, anim.getSpeed().z,
+    // //                                     anim.getPos().x, anim.getPos().y, anim.getPos().z
+    // //                                     );
+    // modelSTL.setPosition(anim.getPos());
+
 }
 
 void Sol::render() {

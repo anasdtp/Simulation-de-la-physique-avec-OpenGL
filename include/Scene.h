@@ -11,10 +11,8 @@
 // Module for space geometry
 #include "geometry.h"
 // Module for generating and rendering forms
+#include "config.h"
 #include "forms.h"
-
-
-
 
 class Scene
 {
@@ -36,23 +34,26 @@ private:
     bool _initWindow(SDL_Window** window, SDL_GLContext* context);
     bool setupObjects();
     char checkInput();
-    bool useSDL=false;
+    bool _useSDL=false;
     void close(SDL_Window** window);
     void checkColisionAll();
     void checkColisionAll(Form* form);
-    
+
 
 public:
     Scene();
 
-
     bool init();
+    void render();
+    void update(double delta_t);
     void run();
+    void checkCollisionAll();
     bool popForm();
+    bool gameOver(){return _quit;}
     bool addForm(Form* form);
     bool removeForm(int index);
     bool removeForm(Form* form);
-    bool useSDL(){return useSDL;}
+    bool useSDL(){return _useSDL;}
 };
 
 

@@ -1,12 +1,13 @@
 #include "Scene.h"
 #include "config.h"
+#include "forms.h"
 Scene::Scene()
 {
     gWindow = NULL;
     camera_position=Point(0, 1.0, 10.0);
-    for (i=0; i<MAX_FORMS_NUMBER; i++)
+    for (int i=0; i<MAX_FORMS_NUMBER; i++)
     {
-        forms_list[i] = NULL;
+        formlist[i] = NULL;
     }
     init();
     setupObjects();
@@ -55,7 +56,7 @@ bool Scene::_initWindow(SDL_Window** window, SDL_GLContext* context)
                 }
 
                 // Initialize OpenGL
-                if( !initGL() )
+                if( !_initGL() )
                 {
                     std::cerr << "Unable to initialize OpenGL!"  << std::endl;
                     success = false;
@@ -146,7 +147,7 @@ bool Scene::init()
     }
     else
     {
-        quit=false;
+        _quit=false;
 
 
     }
@@ -158,9 +159,8 @@ void Scene::checkCollisionAll()
     int i=0;
     while(formlist[i]!=NULL)
     {
-        Form form = *formlist[i];
-        switch(form.getTypeForm()){
-            case SHAPE_ID.CUBE:
+        switch(formlist[i]->getTypeForm()){
+            case SHAPE_ID::CUBE:
             break;
 
             default:
@@ -177,15 +177,51 @@ void Scene::checkCollisionAll()
 
 
 
-        formlist[i]
+        //formlist[i]
     }
-    
+
 
 }
+void Scene::update(double delta_t){
+    // Position et taille du sol (assumées constantes)
+    Point sizeSol(50, 0, 50); // Sol de taille 50 m x 0 m x 50 m
+    Point posSol(-sizeSol.x / 2, 0, -sizeSol.z / 2); // Position du sol
 
+    // Mettre à jour la liste de formes
+    unsigned short i = 0;
+    while (formlist[i] != NULL) {
+        switch (formlist[i]->getTypeForm()) {
+            case BRIQUE:
+            {
+                Point pos = formlist[i]->getAnim().getPos();
+                Vector speed = formlist[i]->getAnim().getSpeed();
+                // Vérifiez la position de la brique par rapport au sol
+                if (pos.y <= posSol.y + sizeSol.y) {
+                    // Collision détectée : ajustez la position et la Force de contre reaction de la brique sur le sol
+                    pos.y = posSol.y + sizeSol.y;
+                    Vector force_contre_reaction(0.0, formlist[i]->g * formlist[i]->getMasse(), 0.0); // Force de contre reaction
+                    formlist[i]->setFn(force_contre_reaction);
+                    speed.y = 0;
+                    formlist[i]->getAnim().setPos(pos);
+                    formlist[i]->getAnim().setSpeed(speed);
+
+                }
+
+            }break;
+            case SOL:{
+
+            }break;
+            default:
+                break;
+        }
+        formlist[i]->update(delta_t);
+        i++;
+    }
+
+}
 void Scene::run()
 {
-    while(!quit)
+    while(!gameOver())
     {
         checkInput();
     // Update the scene
@@ -194,11 +230,11 @@ void Scene::run()
         if (elapsed_time > ANIM_DELAY)
         {
             previous_time = current_time;
-            update(forms_list, 1e-3 * elapsed_time); // International system units : seconds
+            update(elapsed_time); // International system units : seconds
         }
 
         // Render the scene
-        render(forms_list, camera_position);
+        render();
         // Update window screen
         SDL_GL_SwapWindow(gWindow);
     }
@@ -218,16 +254,17 @@ void Scene::close(SDL_Window** window)
 
 bool Scene::addForm(Form* form)
 {
+
+    formlist[formIndex] = form;
     formIndex++;
     if(formIndex >= MAX_FORMS_NUMBER);
     {
         return false;
     }
-    formlist[formIndex] = form;
     return true;
 }
 
-char checkInput()
+char Scene::checkInput()
 {
 // Handle events on queue
     while(SDL_PollEvent(&event) != 0)
@@ -239,7 +276,7 @@ char checkInput()
         {
         // User requests quit
         case SDL_QUIT:
-            quit = true;
+            _quit = true;
             break;
         case SDL_KEYDOWN:
             // Handle key pressed with current mouse position
@@ -249,7 +286,7 @@ char checkInput()
             // Quit the program when 'q' or Escape keys are pressed
             case SDLK_q:
             case SDLK_ESCAPE:
-                quit = true;
+                _quit = true;
                 break;
             case SDLK_LEFT:
                 camera_position.x -= 1;
@@ -280,11 +317,17 @@ char checkInput()
 bool Scene::setupObjects() // Initialisation des objets
 {
     // Create here specific forms and add them to the list...
-    // Don't forget to update the actual number_of_forms !
-    // Cube *pFace = NULL;
-    // pFace = new Cube(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
-    // forms_list[number_of_forms] = pFace;
-    // number_of_forms++;
+     //Don't forget to update the actual number_of_forms !
+     printf("setup\n");
+    Cube *pFace = NULL;
+    pFace = new Cube(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
+    addForm(pFace);
+
+    Brique *pBrique = NULL;
+
+    pBrique = new Brique(GREEN,18.4F,"Solidworks/brique.STL");
+    pBrique->getAnim().setPos(Point(1,1,1));
+    addForm(pBrique);
 
     Sol *sol = new Sol(GREEN); // Créez un nouvel objet de brique en dehors de la boucle
     if (!sol->loadSTL("Solidworks/sol.STL")){
@@ -317,5 +360,50 @@ bool Scene::popForm()
     if(formIndex>0)
     {
         formIndex--;
+    }
+}
+
+void Scene::render()
+{
+    // Clear color buffer and Z-Buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Initialize Modelview Matrix
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+
+    // Set the camera position and parameters
+    gluLookAt(camera_position.x,camera_position.y,camera_position.z, 0.0,0.0,0.0, 0.0,1.0,0.0);
+    // Isometric view
+    glRotated(-45, 0, 1, 0);
+    glRotated(30, 1, 0, -1);
+
+    // X, Y and Z axis
+    glPushMatrix(); // Preserve the camera viewing point for further forms
+    // Render the coordinates system
+    glBegin(GL_LINES);
+    {
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3i(0, 0, 0);
+        glVertex3i(1, 0, 0);
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glVertex3i(0, 0, 0);
+        glVertex3i(0, 1, 0);
+        glColor3f(0.0f, 0.0f, 1.0f);
+        glVertex3i(0, 0, 0);
+        glVertex3i(0, 0, 1);
+    }
+    glEnd();
+    glPopMatrix(); // Restore the camera viewing point for next object
+
+    // Render the list of forms
+    unsigned short i = 0;
+    while(formlist[i] != NULL)
+    {
+        // printf("Type %d\n", formlist[i]->getTypeForm());
+        glPushMatrix(); // Preserve the camera viewing point for further forms
+        formlist[i]->render();
+        glPopMatrix(); // Restore the camera viewing point for next object
+        i++;
     }
 }
