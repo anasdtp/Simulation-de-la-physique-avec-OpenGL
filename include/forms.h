@@ -21,7 +21,7 @@ enum SHAPE_ID{
     CYLINDER,
     CONE,
     BRIQUE,
-    SOL
+    SOL,
 };
 
 class Color

@@ -169,7 +169,6 @@ void ModelSTL::render() {
 void Brique::render() {
     // Render the STL model
     Form::render();
-    printf("model_charge ? :",modelSTL.isLoaded());
     if(!modelSTL.isLoaded()){//Le stl n'a pas été chargée donc on doit dessiner à la main la brique
         //Alors on affiche une brique normal de base
         //Enzo doit faire une brique de 500/1000 de longeur, 200/1000 de largeur et 200/1000 de profondeur

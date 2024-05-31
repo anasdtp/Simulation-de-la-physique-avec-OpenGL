@@ -1,9 +1,10 @@
 #include "Scene.h"
-#include "config.h"
 #include "forms.h"
+#include "config.h"
 Scene::Scene()
 {
     gWindow = NULL;
+    formIndex =0;
     camera_position=Point(0, 1.0, 10.0);
     for (int i=0; i<MAX_FORMS_NUMBER; i++)
     {
@@ -154,21 +155,68 @@ bool Scene::init()
 
 }
 
+void Scene::checkCollisionSingle(Form *firstForm,int formIndex)
+{
+    int i=0;
+    while(formlist[i]!=NULL)
+    {
+        if(i==formIndex) {}
+        /*else{
+            switch(formlist[i]->getTypeForm()){
+                case SHAPE_ID::BRIQUE:
+                    Point p1 = firstForm->getAnim().getPos();
+                    Point p2 = formlist[i]->getAnim().getPos();
+                    //double sumRayon =  firstForm->getAnim().getSize() +  formlist[i]->getAnim().getSize();
+                    distance(p1,p2);
+                    if(distance < sumRayon)
+                    {
+                        /// Collision
+                    }
+                    break;
+                case SHAPE_ID::SPHERE:
+
+                    break;
+                case SHAPE_ID::SOL:
+
+
+                break;
+
+                default:
+                    break;
+
+
+
+            }
+        }*/
+        i++;
+    }
+
+}
 void Scene::checkCollisionAll()
 {
     int i=0;
     while(formlist[i]!=NULL)
     {
+
         switch(formlist[i]->getTypeForm()){
-            case SHAPE_ID::CUBE:
+            case SHAPE_ID::BRIQUE:
+                checkCollisionSingle(formlist[i],i);
+                break;
+            case SHAPE_ID::SPHERE:
+
+                break;
+            case SHAPE_ID::SOL:
+
+
             break;
 
             default:
-            break;
+                break;
 
 
 
         }
+        i++;
 
 
 
@@ -223,20 +271,23 @@ void Scene::run()
 {
     while(!gameOver())
     {
+
         checkInput();
     // Update the scene
+
         current_time = SDL_GetTicks(); // get the elapsed time from SDL initialization (ms)
         elapsed_time = current_time - previous_time;
         if (elapsed_time > ANIM_DELAY)
         {
             previous_time = current_time;
             update(elapsed_time); // International system units : seconds
-        }
 
+        }
         // Render the scene
         render();
         // Update window screen
         SDL_GL_SwapWindow(gWindow);
+
     }
     close(&gWindow);
 
@@ -256,20 +307,21 @@ bool Scene::addForm(Form* form)
 {
 
 
-
-    if(formIndex >= MAX_FORMS_NUMBER);
+    if(formIndex > MAX_FORMS_NUMBER)
     {
+
         return false;
     }
     formlist[formIndex] = form;
     formIndex++;
+
     return true;
 }
 
 char Scene::checkInput()
 {
 // Handle events on queue
-    while(SDL_PollEvent(&event) != 0)
+    while(SDL_PollEvent(& event) != 0)
     {
         int x = 0, y = 0;
         SDL_Keycode key_pressed = event.key.keysym.sym;
@@ -319,18 +371,20 @@ char Scene::checkInput()
 bool Scene::setupObjects() // Initialisation des objets
 {
     // Create here specific forms and add them to the list...
-     //Don't forget to update the actual number_of_forms !
-     printf("setup\n");
-    Cube *pFace = NULL;
-    pFace = new Cube(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
-    addForm(pFace);
+    // Don't forget to update the actual number_of_forms !
+    // Cube *pFace = NULL;
+    // pFace = new Cube(Vector(1,0,0), Vector(0,1,0), Point(-0.5, -0.5, -0.5), 1, 1, ORANGE);
+    // forms_list[number_of_forms] = pFace;
+    // number_of_forms++;
 
-    Brique *pBrique = NULL;
+    Brique *brique = new Brique(GREEN,18.4,"Solidworks/brique.STL");
+    if(!brique->modelSTL.isLoaded())
+    {
+        printf("Failed to load brique.STL model!\n");
 
-    pBrique = new Brique(GREEN,18.4F,"Solidworks/brique.STL");
-    pBrique->getAnim().setPos(Point(1,1,1));
-    addForm(pBrique);
-
+    }
+    brique->getAnim().setPos(Point(1,1,1));
+    addForm(brique);
     Sol *sol = new Sol(GREEN); // Créez un nouvel objet de brique en dehors de la boucle
     if (!sol->loadSTL("Solidworks/sol.STL")){
         printf("Failed to load sol.STL model!\n");
@@ -338,7 +392,7 @@ bool Scene::setupObjects() // Initialisation des objets
     }
     Point sizeSol(50, 0, 50);//sol de taille de 50 m , 0 m, 50 m
     sol->setSize(sizeSol);
-    printf("Size Objet : size X = %2.1f, size Y = %2.1f, size Z = %2.1f\n", sizeSol.x, sizeSol.y, sizeSol.z);
+    //printf("Size Objet : size X = %2.1f, size Y = %2.1f, size Z = %2.1f\n", sizeSol.x, sizeSol.y, sizeSol.z);
     Point pt(-sizeSol.x/2, 0, -sizeSol.z/2);
     sol->moveAbsolue(pt); // Déplacez le nouvel objet brique
     addForm(sol);
@@ -367,6 +421,7 @@ bool Scene::popForm()
 
 void Scene::render()
 {
+
     // Clear color buffer and Z-Buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -400,8 +455,10 @@ void Scene::render()
 
     // Render the list of forms
     unsigned short i = 0;
+
     while(formlist[i] != NULL)
     {
+
         // printf("Type %d\n", formlist[i]->getTypeForm());
         glPushMatrix(); // Preserve the camera viewing point for further forms
         formlist[i]->render();

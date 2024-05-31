@@ -46,9 +46,12 @@
 			<Add library="glu32" />
 			<Add directory="./lib" />
 		</Linker>
+		<Unit filename="include/Scene.h" />
 		<Unit filename="include/animation.h" />
+		<Unit filename="include/config.h" />
 		<Unit filename="include/forms.h" />
 		<Unit filename="include/geometry.h" />
+		<Unit filename="src/Scene.cpp" />
 		<Unit filename="src/animation.cpp" />
 		<Unit filename="src/first_prog.cpp" />
 		<Unit filename="src/forms.cpp" />

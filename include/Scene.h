@@ -48,6 +48,7 @@ public:
     void update(double delta_t);
     void run();
     void checkCollisionAll();
+    void checkCollisionSingle(Form* form,int formIndex);
     bool popForm();
     bool gameOver(){return _quit;}
     bool addForm(Form* form);
