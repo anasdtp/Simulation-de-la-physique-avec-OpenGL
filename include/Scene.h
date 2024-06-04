@@ -17,9 +17,8 @@
 class Scene
 {
 private:
-
-
     Form* formlist[MAX_FORMS_NUMBER];
+    Form* tempFormlist[MAX_FORMS_NUMBER];//Utiliser pour stocker l'etat temporairement
     int formIndex =0;
     Uint32 current_time, previous_time, elapsed_time;
     SDL_Event event;
@@ -27,33 +26,29 @@ private:
     SDL_Window* gWindow ;
     SDL_GLContext gContext;
 
-
-
-    bool _quit=true;
+    bool quit=true;
     bool _initGL();
     bool _initWindow(SDL_Window** window, SDL_GLContext* context);
     bool setupObjects();
     char checkInput();
     bool _useSDL=false;
     void close(SDL_Window** window);
-    void checkColisionAll();
-    void checkColisionAll(Form* form);
+    void checkCollision(int &formIndex, Point &pos, Point &rot, Vector &Fn);
 
+    void setupMurDeBrique(int Longeur, int largeur, Point initiale, Color col);
 
 public:
     Scene();
 
     bool init();
     void render();
-    void update(double delta_t);
+    void update(reel delta_t);
     void run();
-    void checkCollisionAll();
-    void checkCollisionSingle(Form* form,int formIndex);
     bool popForm();
-    bool gameOver(){return _quit;}
+    bool gameOver(){return quit;}
     bool addForm(Form* form);
-    bool removeForm(int index);
-    bool removeForm(Form* form);
+    // bool removeForm(int index);
+    // bool removeForm(Form* form);
     bool useSDL(){return _useSDL;}
 };
 

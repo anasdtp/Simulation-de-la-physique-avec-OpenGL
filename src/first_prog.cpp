@@ -14,9 +14,6 @@
 #include "forms.h"
 #include "Scene.h"
 
-
-
-
 /***************************************************************************/
 /* MAIN Function                                                           */
 /***************************************************************************/
@@ -24,6 +21,7 @@ int main(int argc, char* args[])
 {
     // The window we'll be rendering to
     Scene* mainScene = new Scene();
+    mainScene->init();
     while(!mainScene->gameOver())
     {
         mainScene->run();

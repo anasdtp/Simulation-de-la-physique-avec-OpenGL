@@ -1,7 +1,7 @@
 #include "animation.h"
 
 
-Animation::Animation(double ph, double th, Vector accel, Vector speed, Point p)
+Animation::Animation(reel ph, reel th, Vector accel, Vector speed, Point p)
 {
     // Constructor
     // Initialization
@@ -10,4 +10,13 @@ Animation::Animation(double ph, double th, Vector accel, Vector speed, Point p)
     acc = accel;
     spd = speed;
     pos = p;
+}
+
+bool operator==(const Color &c1, const Color &c2)
+{
+    
+    if(c1.r == c2.r && c1.g == c2.g && c1.b == c2.b){
+        return true;
+    }
+    return false;
 }
