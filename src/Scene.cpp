@@ -6,7 +6,7 @@ Scene::Scene()
 {
     gWindow = NULL;
     formIndex =0;
-    camera_position=Point(0, 1.0, 30.0);
+    camera_position=Point(0, 1.0, 25.0);
     for (int i=0; i<MAX_FORMS_NUMBER; i++)
     {
         formlist[i] = NULL;
@@ -274,7 +274,7 @@ void Scene::checkCollision(int &formIndex, Point &pos, Point &rot, Vector &Fn)
                     pos = formlist[formIndex]->getAnim().getPos();
                     // printf("comp1 : %f << comp2 : %f  <<  ",comp1, comp2 );
                     // std::cout << "Coordonnes de pos: " << pos << vector_pos << v1 << v2 << std::endl;
- 
+
                     // Fimpact = -masse / (0.02 * 2 * sqrt(masse)) * speed + masse*formlist[formIndex]->g*Fimpact; // Doit prendre en compte l'angle l'objet pour faire un cos phi
                     Fn = masse*formlist[formIndex]->g * normal;
 
@@ -369,7 +369,7 @@ void Scene::checkCollision(int &formIndex, Point &pos, Point &rot, Vector &Fn)
         Fn = 0;
         // printf("No obstacle found\n");
     }
-    
+
 }
 
 void Scene::update(reel delta_t){
@@ -389,7 +389,7 @@ void Scene::update(reel delta_t){
             static Point pos, rot; static Vector Fn;
             formlist[i]->update(delta_t);
 
-            
+
             switch (formlist[i]->getAnim().getTypeForm()) {
                 case BRIQUE:
                 {
@@ -434,7 +434,7 @@ void Scene::render()
     glRotated(30, 1, 0, -1);
 
     // X, Y and Z axis
-    
+
     // glPushMatrix(); // Preserve the camera viewing point for further forms
     // // Render the coordinates system
     // glBegin(GL_LINES);
@@ -488,7 +488,7 @@ void Scene::run()
         render();
         // Update window screen
         SDL_GL_SwapWindow(gWindow);
-        
+
     }
     close(&gWindow);
 }
